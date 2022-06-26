@@ -1,11 +1,128 @@
 
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
 
 html {
-  font-family: 'Lato', sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+a, a:hover, a:focus, a:active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.btn-info {
+  background-color: #4dd3ff;
+}
+
+.btn-info:hover {
+  background-color: #00bfff;
+}
+
+@media (min-width: 576px) {
+  .position-sm-static {
+    position: static !important;
+  }
+  .position-sm-relative {
+    position: relative !important;
+  }
+  .position-sm-absolute {
+    position: absolute !important;
+  }
+  .position-sm-fixed {
+    position: fixed !important;
+  }
+  .position-sm-sticky {
+    position: sticky !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .position-md-static {
+    position: static !important;
+  }
+  .position-md-relative {
+    position: relative !important;
+  }
+  .position-md-absolute {
+    position: absolute !important;
+  }
+  .position-md-fixed {
+    position: fixed !important;
+  }
+  .position-md-sticky {
+    position: sticky !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .position-lg-static {
+    position: static !important;
+  }
+  .position-lg-relative {
+    position: relative !important;
+  }
+  .position-lg-absolute {
+    position: absolute !important;
+  }
+  .position-lg-fixed {
+    position: fixed !important;
+  }
+  .position-lg-sticky {
+    position: sticky !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .position-xl-static {
+    position: static !important;
+  }
+  .position-xl-relative {
+    position: relative !important;
+  }
+  .position-xl-absolute {
+    position: absolute !important;
+  }
+  .position-xl-fixed {
+    position: fixed !important;
+  }
+  .position-xl-sticky {
+    position: sticky !important;
+  }
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.page-enter-from{
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s;
+}
+.page-enter,
+.page-leave-to {
+  opacity: 0;
 }
