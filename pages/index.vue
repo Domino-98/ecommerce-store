@@ -1,7 +1,194 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+let bestsellersContainer = ref();
+let promosContainer = ref();
+
+let bestsellersScroll = ref<number>(0);
+let promosScroll = ref<number>(0);
+let bestsellersEnd = ref<boolean>();
+let promosEnd = ref<boolean>();
+
+const scrollLeft = (container) => {
+  container.scrollLeft -= 332;
+  setTimeout(() => {
+    calculateScroll(container);
+  }, 500);
+};
+
+const scrollRight = (container) => {
+  container.scrollLeft += 332;
+  setTimeout(() => {
+    calculateScroll(container);
+  }, 500);
+};
+
+const calculateScroll = (container) => {
+  switch (container) {
+    case bestsellersContainer.value:
+      bestsellersScroll.value = container.scrollLeft;
+      bestsellersEnd.value =
+        container.offsetWidth + bestsellersScroll.value === container.scrollWidth;
+      break;
+    case promosContainer.value:
+      promosScroll.value = container.scrollLeft;
+      promosEnd.value =
+        container.offsetWidth + promosScroll.value === container.scrollWidth;
+      break;
+  }
+};
+</script>
 
 <template>
   <div>
-    <h1>Home page</h1>
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Witamy w sklepie</h1>
+        <h1 class="fw-bold">G&D</h1>
+        <p class="mt-1">Twój ulubiony sklep internetowy z biżuterią</p>
+        <a href="#bestsellery" class="btn hero-btn btn-lg mt-3">Bestsellery</a>
+      </div>
+    </div>
+    <div class="container">
+      <h2 id="bestsellery" class="text-center mt-5 mb-1">Bestsellery</h2>
+      <div class="position-relative">
+        <i
+          v-if="bestsellersScroll > 0"
+          @click="scrollLeft(bestsellersContainer)"
+          class="bi bi-chevron-left position-absolute fs-3 scroll-btn"
+        ></i>
+        <i
+          v-if="!bestsellersEnd"
+          @click="scrollRight(bestsellersContainer)"
+          class="bi bi-chevron-right position-absolute fs-3 scroll-btn"
+        ></i>
+        <div
+          ref="bestsellersContainer"
+          class="d-flex py-4 flex-nowrap overflow-auto product-container"
+        >
+          <ProductCard v-for="product in 10" />
+        </div>
+      </div>
+
+      <h2 id="bestsellery" class="text-center mt-3 mb-1">Promocje</h2>
+      <div class="position-relative">
+        <i
+          v-if="promosScroll > 0"
+          @click="scrollLeft(promosContainer)"
+          class="bi bi-chevron-left position-absolute fs-3 scroll-btn"
+        ></i>
+        <i
+          v-if="!promosEnd"
+          @click="scrollRight(promosContainer)"
+          class="bi bi-chevron-right position-absolute fs-3 scroll-btn"
+        ></i>
+
+        <div
+          ref="promosContainer"
+          class="d-flex py-4 flex-nowrap overflow-auto product-container"
+        >
+          <ProductCard v-for="product in 10" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.product-container {
+  scroll-behavior: smooth;
+}
+.scroll-btn {
+  color: #a0a0a0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  height: 100%;
+  width: 10vw;
+  cursor: pointer;
+}
+
+.scroll-btn:hover {
+  color: black;
+}
+
+.bi-chevron-left {
+  left: -2rem;
+  justify-content: flex-start;
+  background: linear-gradient(-90deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+}
+
+.bi-chevron-right {
+  right: -2rem;
+  justify-content: flex-end;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, #fff 100%);
+}
+
+.btn {
+  border-radius: 0;
+}
+.hero {
+  position: relative;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("../assets/hero.jpg");
+  height: 70vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+.hero-text h1 {
+  text-transform: uppercase;
+}
+
+.hero-text p {
+  font-size: 1.4rem;
+}
+
+.hero-btn {
+  transition: all 0.3s;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #eee;
+  background-color: transparent;
+  text-transform: uppercase;
+  color: #eee;
+}
+
+.hero-btn:hover {
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.4);
+}
+
+.product-container::-webkit-scrollbar {
+  display: none;
+}
+
+.product-container {
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+  overflow-y: scroll;
+}
+
+@media (hover: none) {
+  .scroll-btn {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .bi-chevron-left {
+    left: 0;
+  }
+  .bi-chevron-right {
+    right: 0;
+  }
+}
+</style>

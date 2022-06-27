@@ -19,11 +19,16 @@ a, a:hover, a:focus, a:active {
 }
 
 .btn-info {
-  background-color: #4dd3ff;
+  background-color: #4dd3ff !important;
 }
 
 .btn-info:hover {
-  background-color: #00bfff;
+  background-color: #00bfff !important;
+}
+
+.btn-outline-info:hover {
+  background-color: #4dd3ff !important;
+  color: #fff;
 }
 
 @media (min-width: 576px) {
