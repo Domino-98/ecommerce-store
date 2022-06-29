@@ -1,4 +1,26 @@
 <script setup lang="ts">
+import { useProducts } from "~/stores/productStore";
+
+const { find } = useStrapi4();
+const productStore = useProducts();
+
+onMounted(async () => {
+  try {
+    const response: any = await find("bestsellers", {
+      populate: {
+        products: {
+          populate: "*",
+        },
+      } as any,
+    });
+    productStore.setBestsellingProducts(response.data[0].attributes.products.data);
+
+    console.log(productStore.getBestsellingProducts);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 let bestsellersContainer = ref();
 let promosContainer = ref();
 
@@ -64,7 +86,11 @@ const calculateScroll = (container) => {
           ref="bestsellersContainer"
           class="d-flex py-4 flex-nowrap overflow-auto product-container"
         >
-          <ProductCard v-for="product in 10" />
+          <CardProduct
+            v-for="product in productStore.getBestsellingProducts"
+            :key="product.id"
+            :product="product"
+          />
         </div>
       </div>
 
@@ -85,7 +111,11 @@ const calculateScroll = (container) => {
           ref="promosContainer"
           class="d-flex py-4 flex-nowrap overflow-auto product-container"
         >
-          <ProductCard v-for="product in 10" />
+          <CardProduct
+            v-for="product in productStore.getBestsellingProducts"
+            :key="product.id"
+            :product="product"
+          />
         </div>
       </div>
     </div>
@@ -93,6 +123,9 @@ const calculateScroll = (container) => {
 </template>
 
 <style scoped>
+.container {
+  min-height: 85vh;
+}
 .product-container {
   scroll-behavior: smooth;
 }

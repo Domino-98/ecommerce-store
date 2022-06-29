@@ -18,17 +18,16 @@ export const useProducts = defineStore('products', {
     addToWishlist(product) {
       this.wishlistProducts.push(product);
     },
-    removeFromWishlist(id) {
+    removeFromWishlist(id: number) {
       this.wishlistProducts.splice(this.wishlistProducts.findIndex((product) => product.id === id), 1);
     },
     addToCart(product) {
       this.cartProducts.push(product);
     },
-    removeFromCart(id) {
+    removeFromCart(id: number) {
       this.cartProducts.splice(this.cartProducts.findIndex((product) => product.id === id), 1);
     },
     setBestsellingProducts(products) {
-      console.log(products);
       this.bestsellingProducts = products;
     },
     setPromoProducts(products) {

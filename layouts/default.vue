@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useProducts } from "~~/stores/productStore";
+const products = useProducts();
+
 const nuxtApp = useNuxtApp();
 
 nuxtApp.hook("page:finish", () => {
@@ -15,7 +18,9 @@ nuxtApp.hook("page:finish", () => {
     <NuxtLink to="/cart">
       <div class="cart position-fixed text-light">
         <i class="bi bi-basket2-fill"></i>
-        <span class="position-absolute bg-dark text-light">5</span>
+        <span class="position-absolute bg-dark text-light">{{
+          products.getCartProducts.length
+        }}</span>
       </div>
     </NuxtLink>
     <Footer />
