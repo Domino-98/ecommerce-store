@@ -1,4 +1,25 @@
 <script setup lang="ts">
+import { useProducts } from "~/stores/productStore";
+
+const productStore = useProducts();
+const { findOne } = useStrapi4();
+const route = useRoute();
+
+let product = ref();
+let categoryName = ref<string>();
+
+onMounted(async () => {
+  try {
+    const response: any = await findOne("products", route.params.id as string, {
+      populate: "*",
+    });
+    product.value = response.data;
+    categoryName.value = response.data.attributes.category.data.attributes.Name;
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 let productQuantity = ref<number>(1);
 let errorMsg = ref<string>("");
 
@@ -9,67 +30,151 @@ let decrementQuantity = () => {
   if (productQuantity.value > 1) productQuantity.value--;
 };
 
+type Modal = "cart" | "wishlist";
+let modalType = ref<Modal>();
+let isOpen = ref<boolean>(false);
+
 const addToCart = () => {
+  modalType.value = "cart";
   errorMsg.value = "";
   if (productQuantity.value < 1) {
     errorMsg.value = "Wprowadź poprawną ilość";
+    return;
   }
-  // Add product to cart
+
+  isOpen.value = true;
+  console.log(isOpen.value);
+};
+
+let alreadyOnList = ref<boolean>();
+
+const addToWishlist = (product) => {
+  modalType.value = "wishlist";
+  isOpen.value = true;
+  if (productStore.getWishlistProducts.some((p) => p.id === product.id)) {
+    alreadyOnList.value = true;
+    productStore.removeFromWishlist(product.id);
+    return;
+  }
+  alreadyOnList.value = false;
+  productStore.addToWishlist(product);
 };
 </script>
 
 <template>
   <div>
     <div class="container mt-4">
-      <div class="d-flex gap-1 navigation">
-        <NuxtLink to="/">Strona główna</NuxtLink>
-        <i class="bi bi-chevron-right grey"></i>
-        <NuxtLink to="#">Kolczyki</NuxtLink>
-        <i class="bi bi-chevron-right grey"></i>
-        <NuxtLink to="#">Kolczyki Galaxy</NuxtLink>
-      </div>
-      <div class="row mt-4">
-        <div class="col-12 col-lg-6">
-          <img src="../../assets/earrings2.jpg" class="product-img" />
-          <div class="d-flex mt-2 gap-2 thumbnail-list">
-            <img class="product-thumbnail" src="../../assets/earrings2.jpg" />
-          </div>
+      <div v-if="product">
+        <Modal :open="isOpen" @close="isOpen = !isOpen">
+          <template v-slot:icon>
+            <div
+              v-if="alreadyOnList && modalType === 'wishlist'"
+              class="sa-warning mx-auto"
+            >
+              <div class="sa-warning-body"></div>
+              <div class="sa-warning-dot"></div>
+            </div>
+            <div v-else class="sa-success mx-auto">
+              <div class="sa-success-tip"></div>
+              <div class="sa-success-long"></div>
+              <div class="sa-success-placeholder"></div>
+              <div class="sa-success-fix"></div>
+            </div>
+          </template>
+          <template v-slot:body>
+            <div v-if="modalType === 'cart'">
+              <h4 class="mt-4">Koszyk zaktualizowany!</h4>
+              <p class="fs5 mt-3">
+                Produkt {{ product.attributes.Name }} został dodany do koszyka!
+              </p>
+            </div>
+            <div v-else>
+              <h4 v-show="alreadyOnList" class="mt-4">
+                Produkt usunięty z twojej listy życzeń!
+              </h4>
+              <h4 v-show="!alreadyOnList" class="mt-4">Lista życzeń zaktualizowana!</h4>
+              <p v-show="!alreadyOnList" class="fs5 mt-3">
+                Produkt {{ product.attributes.Name }} został dodany do listy życzeń!
+              </p>
+            </div>
+          </template>
+          <template v-slot:button>
+            <div v-if="modalType === 'cart'" class="d-flex justify-content-evenly mt-4">
+              <NuxtLink to="/cart" class="btn btn-md btn-info text-light"
+                >Przejdź do koszyka</NuxtLink
+              >
+              <button class="btn btn-md btn-outline-info" @click="isOpen = false">
+                Kontynuuj zakupy
+              </button>
+            </div>
+            <div v-else>
+              <div class="d-flex justify-content-evenly mt-4">
+                <button class="btn btn-md btn-outline-info px-4" @click="isOpen = false">
+                  Ok
+                </button>
+              </div>
+            </div>
+          </template>
+        </Modal>
+        <div class="d-flex gap-1 navigation">
+          <NuxtLink to="/">Strona główna</NuxtLink>
+          <i class="bi bi-chevron-right grey"></i>
+          <NuxtLink :to="`/category/${categoryName?.toLowerCase()}`">{{
+            categoryName
+          }}</NuxtLink>
+          <i class="bi bi-chevron-right grey"></i>
+          <NuxtLink to="#">{{ product.attributes.Name }}</NuxtLink>
         </div>
-        <div class="col-12 col-lg-6">
-          <h2 class="mt-2 mt-lg-0">Kolczyki Galaxy</h2>
-          <p class="mt-1 fs-4">400zł</p>
-          <p class="mt-3">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus esse
-            obcaecati, neque sequi pariatur praesentium corrupti, cum amet tempore
-            repellat tenetur aliquam dignissimos reiciendis aliquid vero commodi ratione
-            id labore nobis eum quidem?
-          </p>
-          <div class="d-flex align-items-center mt-3 gap-2 product-quantity">
-            <i
-              @click="decrementQuantity"
-              class="bi bi-dash-circle"
-              :class="{
-                grey: productQuantity < 2,
-                'highlight-icon': productQuantity > 1,
-              }"
-            ></i>
-            <input v-model="productQuantity" class="quantity-input" type="number" />
-            <i @click="incrementQuantity" class="bi bi-plus-circle highlight-icon"></i>
+        <div class="row mt-4">
+          <div class="col-12 col-lg-6">
+            <img
+              :src="`http://localhost:1337${product.attributes.Image.data[0].attributes.formats.large.url}`"
+              class="product-img"
+            />
+            <div class="d-flex mt-2 gap-2 thumbnail-list">
+              <img
+                v-for="image in product.attributes.Image.data"
+                class="product-thumbnail"
+                :src="`http://localhost:1337${image.attributes.formats.large.url}`"
+              />
+            </div>
           </div>
-          <p v-if="errorMsg" class="error mt-1">{{ errorMsg }}</p>
-          <div class="d-flex align-items-center mt-3 gap-3">
-            <button @click="addToCart" class="btn btn-lg btn-info text-light w-100">
-              Dodaj do koszyka
-            </button>
-            <i class="bi bi-heart highlight-icon" title="Dodaj do listy życzeń"></i>
-          </div>
-          <div class="d-flex align-items-center gap-2 mt-2">
-            <i class="bi bi-truck fs-4"></i>
-            <p class="info">Wysyłka w ciągu 2 dni roboczych</p>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-gem fs-4"></i>
-            <p class="info">Gwarancja jakości</p>
+          <div class="col-12 col-lg-6">
+            <h2 class="mt-2 mt-lg-0">{{ product.attributes.Name }}</h2>
+            <p class="mt-1 fs-4">{{ product.attributes.Price }}zł</p>
+            <p class="mt-3">
+              {{ product.attributes.Description }}
+            </p>
+            <div class="d-flex align-items-center mt-3 gap-2 product-quantity">
+              <i
+                @click="decrementQuantity"
+                class="bi bi-dash-circle"
+                :class="{
+                  grey: productQuantity < 2,
+                  'highlight-icon': productQuantity > 1,
+                }"
+              ></i>
+              <input v-model="productQuantity" class="quantity-input" type="number" />
+              <i @click="incrementQuantity" class="bi bi-plus-circle highlight-icon"></i>
+            </div>
+            <p v-if="errorMsg" class="error mt-1">{{ errorMsg }}</p>
+            <div class="d-flex align-items-center mt-3 gap-3">
+              <button @click="addToCart" class="btn btn-lg btn-info text-light w-100">
+                Dodaj do koszyka
+              </button>
+              <i
+                @click.prevent="addToWishlist(product)"
+                class="bi bi-heart highlight-icon"
+              ></i>
+            </div>
+            <div class="d-flex align-items-center gap-2 mt-2">
+              <i class="bi bi-truck fs-4"></i>
+              <p class="info">Wysyłka w ciągu 2 dni roboczych</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-gem fs-4"></i>
+              <p class="info">Gwarancja jakości</p>
+            </div>
           </div>
         </div>
       </div>

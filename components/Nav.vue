@@ -28,7 +28,9 @@ setInterval(() => {
         <a class="navbar-brand position-md-absolute logo fs-3" href="#">D&G</a>
         <div class="d-flex gap-4 position-md-absolute ms-auto nav-icons">
           <i class="bi bi-person"></i>
-          <i class="bi bi-heart"></i>
+          <NuxtLink to="/wishlist" title="Lista życzeń"
+            ><i class="bi bi-heart"></i
+          ></NuxtLink>
         </div>
         <button
           @click="toggleNav = !toggleNav"
@@ -55,7 +57,7 @@ setInterval(() => {
               >
             </li>
             <li class="nav-item">
-              <NuxtLink to="/category/earrings" active-class="active" class="nav-link"
+              <NuxtLink to="/category/kolczyki" active-class="active" class="nav-link"
                 ><span
                   class="w-100 d-inline-block py-3"
                   data-bs-toggle="collapse"
@@ -65,7 +67,7 @@ setInterval(() => {
               >
             </li>
             <li class="nav-item">
-              <NuxtLink to="/category/rings" active-class="active" class="nav-link"
+              <NuxtLink to="/category/pierścionki" active-class="active" class="nav-link"
                 ><span
                   class="w-100 d-inline-block py-3"
                   data-bs-toggle="collapse"
@@ -75,7 +77,7 @@ setInterval(() => {
               >
             </li>
             <li class="nav-item">
-              <NuxtLink to="/category/necklace" active-class="active" class="nav-link"
+              <NuxtLink to="/category/naszyjniki" active-class="active" class="nav-link"
                 ><span
                   class="w-100 d-inline-block py-3"
                   data-bs-toggle="collapse"
@@ -85,7 +87,7 @@ setInterval(() => {
               >
             </li>
             <li class="nav-item">
-              <NuxtLink to="/category/bracelets" active-class="active" class="nav-link"
+              <NuxtLink to="/category/bransoletki" active-class="active" class="nav-link"
                 ><span
                   class="w-100 d-inline-block py-3"
                   data-bs-toggle="collapse"
