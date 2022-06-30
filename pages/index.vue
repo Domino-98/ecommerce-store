@@ -4,7 +4,16 @@ import { useProducts } from "~/stores/productStore";
 const { find } = useStrapi4();
 const productStore = useProducts();
 
-onMounted(async () => {
+onMounted(() => {
+  if (productStore.getBestsellingProducts.length === 0) {
+    fetchBestellers();
+  }
+  if (productStore.getPromoProducts.length === 0) {
+    fetchPromos();
+  }
+});
+
+const fetchBestellers = async () => {
   try {
     const response: any = await find("bestsellers", {
       populate: {
@@ -13,13 +22,35 @@ onMounted(async () => {
         },
       } as any,
     });
-    productStore.setBestsellingProducts(response.data[0].attributes.products.data);
 
-    console.log(productStore.getBestsellingProducts);
+    productStore.setBestsellingProducts(response.data[0].attributes.products.data);
   } catch (error) {
     console.log(error);
   }
-});
+};
+
+const fetchPromos = async () => {
+  try {
+    const response: any = await find("discounts", {
+      populate: {
+        products: {
+          populate: "*",
+        },
+      } as any,
+    });
+
+    let promoProducts = response.data
+      .sort((a, b) => b.attributes.Discount_percent - a.attributes.Discount_percent)
+      .map((item) => item.attributes.products.data)
+      .flat();
+
+    productStore.setPromoProducts(promoProducts);
+  } catch (error) {
+    console.log(error);
+  }
+
+  console.log();
+};
 
 let bestsellersContainer = ref();
 let promosContainer = ref();
@@ -90,6 +121,8 @@ const calculateScroll = (container) => {
             v-for="product in productStore.getBestsellingProducts"
             :key="product.id"
             :product="product"
+            :discount="product.attributes.discount.data?.attributes?.Discount_percent"
+            @on-wishlist="(value) => (product.onWishlist = value)"
           />
         </div>
       </div>
@@ -112,9 +145,11 @@ const calculateScroll = (container) => {
           class="d-flex py-4 flex-nowrap overflow-auto product-container"
         >
           <CardProduct
-            v-for="product in productStore.getBestsellingProducts"
+            v-for="product in productStore.getPromoProducts"
             :key="product.id"
             :product="product"
+            :discount="product.attributes.discount.data.attributes.Discount_percent"
+            @on-wishlist="(value) => (product.onWishlist = value)"
           />
         </div>
       </div>

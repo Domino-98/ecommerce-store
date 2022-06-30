@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const useProducts = defineStore('products', {
   state: () => ({
@@ -17,9 +17,15 @@ export const useProducts = defineStore('products', {
   actions: {
     addToWishlist(product) {
       this.wishlistProducts.push(product);
+      if (process.client) {
+        localStorage.setItem("wishlist", JSON.stringify(this.wishlistProducts));
+      }
     },
     removeFromWishlist(id: number) {
       this.wishlistProducts.splice(this.wishlistProducts.findIndex((product) => product.id === id), 1);
+      if (process.client) {
+        localStorage.setItem("wishlist", JSON.stringify(this.wishlistProducts));
+      }
     },
     addToCart(product) {
       this.cartProducts.push(product);

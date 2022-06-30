@@ -24,7 +24,6 @@ onMounted(async () => {
     });
 
     products.value = response.data[0].attributes.products.data;
-    console.log(products.value);
   } catch (error) {
     console.log(error);
   }
@@ -41,7 +40,12 @@ onMounted(async () => {
           v-for="product in products"
           :key="product.id"
         >
-          <CardProduct :product="product" />
+          <CardProduct
+            :product="product"
+            :key="product.id"
+            :discount="product.attributes.discount.data?.attributes?.Discount_percent"
+            @on-wishlist="(value) => (product.onWishlist = value)"
+          />
         </div>
       </div>
     </div>

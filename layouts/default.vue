@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useProducts } from "~~/stores/productStore";
-const products = useProducts();
+const productStore = useProducts();
 
 const nuxtApp = useNuxtApp();
 
@@ -8,6 +8,12 @@ nuxtApp.hook("page:finish", () => {
   setTimeout(() => {
     window.scrollTo(0, 0);
   }, 300);
+});
+
+onMounted(() => {
+  if (localStorage.getItem("wishlist") !== null) {
+    productStore.$state.wishlistProducts = JSON.parse(localStorage.getItem("wishlist"));
+  }
 });
 </script>
 
@@ -19,7 +25,7 @@ nuxtApp.hook("page:finish", () => {
       <div class="cart position-fixed text-light">
         <i class="bi bi-basket2-fill"></i>
         <span class="position-absolute bg-dark text-light">{{
-          products.getCartProducts.length
+          productStore.getCartProducts.length
         }}</span>
       </div>
     </NuxtLink>

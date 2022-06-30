@@ -6,26 +6,41 @@ const { findOne } = useStrapi4();
 const route = useRoute();
 
 let product = ref();
+let productQuantity = ref<number>(1);
 let categoryName = ref<string>();
+let onWishlist = ref<boolean>();
 
-onMounted(async () => {
+onMounted(() => {
+  fetchProduct();
+});
+
+const fetchProduct = async () => {
   try {
     const response: any = await findOne("products", route.params.id as string, {
       populate: "*",
     });
+
     product.value = response.data;
+    console.log(product.value);
+    product.value.quantity = 1;
     categoryName.value = response.data.attributes.category.data.attributes.Name;
+
+    if (productStore.getWishlistProducts.some((p) => p.id === product.value.id)) {
+      onWishlist.value = true;
+    } else {
+      onWishlist.value = false;
+    }
   } catch (error) {
     console.log(error);
   }
-});
+};
 
-let productQuantity = ref<number>(1);
 let errorMsg = ref<string>("");
 
 let incrementQuantity = () => {
   productQuantity.value++;
 };
+
 let decrementQuantity = () => {
   if (productQuantity.value > 1) productQuantity.value--;
 };
@@ -34,30 +49,35 @@ type Modal = "cart" | "wishlist";
 let modalType = ref<Modal>();
 let isOpen = ref<boolean>(false);
 
-const addToCart = () => {
+const addToCart = (product) => {
   modalType.value = "cart";
   errorMsg.value = "";
   if (productQuantity.value < 1) {
     errorMsg.value = "Wprowadź poprawną ilość";
     return;
   }
-
   isOpen.value = true;
-  console.log(isOpen.value);
-};
+  product.quantity = productQuantity.value;
 
-let alreadyOnList = ref<boolean>();
+  productStore.addToCart(product);
+  console.log("Product", product);
+  console.log("Cart", productStore.getCartProducts);
+};
 
 const addToWishlist = (product) => {
   modalType.value = "wishlist";
+  onWishlist.value = true;
   isOpen.value = true;
-  if (productStore.getWishlistProducts.some((p) => p.id === product.id)) {
-    alreadyOnList.value = true;
-    productStore.removeFromWishlist(product.id);
-    return;
-  }
-  alreadyOnList.value = false;
+  product.onWishList = true;
   productStore.addToWishlist(product);
+};
+
+const removeFromWishlist = (product) => {
+  modalType.value = "wishlist";
+  onWishlist.value = false;
+  isOpen.value = true;
+  product.onWishList = false;
+  productStore.removeFromWishlist(product.id);
 };
 </script>
 
@@ -68,7 +88,7 @@ const addToWishlist = (product) => {
         <Modal :open="isOpen" @close="isOpen = !isOpen">
           <template v-slot:icon>
             <div
-              v-if="alreadyOnList && modalType === 'wishlist'"
+              v-if="!onWishlist && modalType === 'wishlist'"
               class="sa-warning mx-auto"
             >
               <div class="sa-warning-body"></div>
@@ -89,11 +109,11 @@ const addToWishlist = (product) => {
               </p>
             </div>
             <div v-else>
-              <h4 v-show="alreadyOnList" class="mt-4">
+              <h4 v-show="!onWishlist" class="mt-4">
                 Produkt usunięty z twojej listy życzeń!
               </h4>
-              <h4 v-show="!alreadyOnList" class="mt-4">Lista życzeń zaktualizowana!</h4>
-              <p v-show="!alreadyOnList" class="fs5 mt-3">
+              <h4 v-show="onWishlist" class="mt-4">Lista życzeń zaktualizowana!</h4>
+              <p v-show="onWishlist" class="fs5 mt-3">
                 Produkt {{ product.attributes.Name }} został dodany do listy życzeń!
               </p>
             </div>
@@ -141,7 +161,27 @@ const addToWishlist = (product) => {
           </div>
           <div class="col-12 col-lg-6">
             <h2 class="mt-2 mt-lg-0">{{ product.attributes.Name }}</h2>
-            <p class="mt-1 fs-4">{{ product.attributes.Price }}zł</p>
+            <div v-if="product.attributes.discount.data" class="mt-1">
+              <p>
+                <span class="discount me-2 fs-4">{{ product.attributes.Price }}</span>
+                <span class="price fs-4"
+                  >{{
+                    product.attributes.Price -
+                    product.attributes.Price *
+                      (product.attributes.discount.data.attributes.Discount_percent /
+                        100)
+                  }}zł</span
+                >
+              </p>
+              <p class="text-dark text-black-50">
+                Oszczędzasz
+                {{
+                  product.attributes.Price *
+                  (product.attributes.discount.data.attributes.Discount_percent / 100)
+                }}zł
+              </p>
+            </div>
+            <p v-else class="mt-1 fs-4">{{ product.attributes.Price }}zł</p>
             <p class="mt-3">
               {{ product.attributes.Description }}
             </p>
@@ -159,12 +199,21 @@ const addToWishlist = (product) => {
             </div>
             <p v-if="errorMsg" class="error mt-1">{{ errorMsg }}</p>
             <div class="d-flex align-items-center mt-3 gap-3">
-              <button @click="addToCart" class="btn btn-lg btn-info text-light w-100">
+              <button
+                @click="addToCart(product)"
+                class="btn btn-lg btn-info text-light w-100"
+              >
                 Dodaj do koszyka
               </button>
               <i
+                v-if="!onWishlist"
                 @click.prevent="addToWishlist(product)"
                 class="bi bi-heart highlight-icon"
+              ></i>
+              <i
+                v-else
+                @click.prevent="removeFromWishlist(product)"
+                class="bi bi-heart-fill highlight-icon"
               ></i>
             </div>
             <div class="d-flex align-items-center gap-2 mt-2">
@@ -218,7 +267,8 @@ input[type="number"] {
 }
 
 :global(.product-quantity i),
-.bi-heart {
+.bi-heart,
+.bi-heart-fill {
   color: #252525;
   font-size: 1.8rem;
   cursor: pointer;

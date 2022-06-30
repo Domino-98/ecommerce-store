@@ -3,21 +3,36 @@ import { useProducts } from "~/stores/productStore";
 
 const props = defineProps({
   product: { type: Object, required: true },
+  discount: { type: Number, required: false },
 });
+
+const emit = defineEmits(["onWishlist"]);
+
+const setWishlist = (value: boolean) => {
+  emit("onWishlist", value);
+};
 
 let productStore = useProducts();
 let isOpen = ref<boolean>(false);
-let alreadyOnList = ref<boolean>();
+
+onMounted(() => {
+  if (productStore.getWishlistProducts.some((p) => p.id === props.product.id)) {
+    setWishlist(true);
+  } else {
+    setWishlist(false);
+  }
+});
 
 const addToWishlist = (product) => {
+  setWishlist(true);
   isOpen.value = true;
-  if (productStore.getWishlistProducts.some((p) => p.id === product.id)) {
-    alreadyOnList.value = true;
-    productStore.removeFromWishlist(product.id);
-    return;
-  }
-  alreadyOnList.value = false;
   productStore.addToWishlist(product);
+};
+
+const removeFromWishlist = (product) => {
+  setWishlist(false);
+  isOpen.value = true;
+  productStore.removeFromWishlist(product.id);
 };
 </script>
 
@@ -25,11 +40,11 @@ const addToWishlist = (product) => {
   <div>
     <Modal :open="isOpen" @close="isOpen = !isOpen">
       <template v-slot:icon>
-        <div v-show="alreadyOnList" class="sa-warning mx-auto">
+        <div v-show="!product.onWishlist" class="sa-warning mx-auto">
           <div class="sa-warning-body"></div>
           <div class="sa-warning-dot"></div>
         </div>
-        <div v-show="!alreadyOnList" class="sa-success mx-auto">
+        <div v-show="product.onWishlist" class="sa-success mx-auto">
           <div class="sa-success-tip"></div>
           <div class="sa-success-long"></div>
           <div class="sa-success-placeholder"></div>
@@ -37,11 +52,11 @@ const addToWishlist = (product) => {
         </div>
       </template>
       <template v-slot:body>
-        <h4 v-show="alreadyOnList" class="mt-4">
+        <h4 v-show="!product.onWishlist" class="mt-4">
           Produkt usunięty z twojej listy życzeń!
         </h4>
-        <h4 v-show="!alreadyOnList" class="mt-4">Lista życzeń zaktualizowana!</h4>
-        <p v-show="!alreadyOnList" class="fs5 mt-3">
+        <h4 v-show="product.onWishlist" class="mt-4">Lista życzeń zaktualizowana!</h4>
+        <p v-show="product.onWishlist" class="fs5 mt-3">
           Produkt {{ product.attributes.Name }} został dodany do listy życzeń!
         </p>
       </template>
@@ -54,21 +69,38 @@ const addToWishlist = (product) => {
       </template>
     </Modal>
 
-    <div v-if="props.product" class="position-relative shadow mx-3 product-card">
+    <div v-if="product" class="position-relative shadow mx-3 product-card">
       <NuxtLink :to="`/product/${props.product.id}`">
         <div class="img-container">
+          <div v-if="discount" class="position-absolute text-light discount-percent">
+            -{{ discount }}%
+          </div>
           <img
-            :src="`http://localhost:1337${props.product.attributes.Image.data[0].attributes.formats.medium.url}`"
+            :src="`http://localhost:1337${product.attributes.Image.data[0].attributes.formats.medium.url}`"
             class="w-100 h-100"
           />
           <i
-            @click.prevent="addToWishlist(props.product)"
+            v-if="!product.onWishlist"
+            @click.prevent="addToWishlist(product)"
             class="bi bi-heart position-absolute"
+          ></i>
+          <i
+            v-else
+            @click.prevent="removeFromWishlist(product)"
+            class="bi bi-heart-fill position-absolute"
           ></i>
         </div>
         <div class="text-center py-2">
-          <h5>{{ props.product.attributes.Name }}</h5>
-          <span class="price">{{ props.product.attributes.Price }}zł</span>
+          <h5>{{ product.attributes.Name }}</h5>
+          <span v-if="discount" class="discount me-2">{{
+            product.attributes.Price
+          }}</span>
+          <span v-if="discount" class="price"
+            >{{
+              product.attributes.Price - product.attributes.Price * (discount / 100)
+            }}zł</span
+          >
+          <span v-else class="price">{{ product.attributes.Price }}zł</span>
         </div>
       </NuxtLink>
     </div>
@@ -103,33 +135,41 @@ const addToWishlist = (product) => {
   transform: scale(1.25);
 }
 
-.discount {
+:global(.discount) {
   text-decoration: line-through;
   color: grey;
 }
 
+:global(.discount + .price) {
+  color: #ff4444;
+}
+
 .discount-percent {
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
+  top: 0.5rem;
+  left: 0.5rem;
   width: 2.6rem;
   height: 2.6rem;
+  border-radius: 50%;
+  padding: 1.5rem;
+  font-weight: bold;
   font-size: 0.9rem;
   background-color: #ff4444;
 }
 
-.discount + .price {
-  color: #ff4444;
-}
-
-.bi-heart {
+.bi-heart,
+.bi-heart-fill {
   top: 0.6rem;
   right: 0.9rem;
   font-size: 1.5rem;
   transition: all 0.3s;
 }
 
-.bi-heart:hover {
+.bi-heart:hover,
+.bi-heart-fill:hover {
   color: #4dd3ff;
 }
 </style>
