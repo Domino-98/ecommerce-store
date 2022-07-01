@@ -14,6 +14,9 @@ onMounted(() => {
   if (localStorage.getItem("wishlist") !== null) {
     productStore.$state.wishlistProducts = JSON.parse(localStorage.getItem("wishlist"));
   }
+  if (localStorage.getItem("cart") !== null) {
+    productStore.$state.cartProducts = JSON.parse(localStorage.getItem("cart"));
+  }
 });
 </script>
 

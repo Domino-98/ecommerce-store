@@ -1,12 +1,28 @@
 <script setup lang="ts">
-let productQuantity = ref<number>(1);
-let errorMsg = ref<string>("");
+import { useProducts } from "~/stores/productStore";
+import type { CartProduct } from "~/models/cartproduct";
 
-let incrementQuantity = () => {
-  productQuantity.value++;
+const productStore = useProducts();
+let errorMsg = ref<string>();
+
+let incrementQuantity = (product: CartProduct) => {
+  product.quantity++;
 };
-let decrementQuantity = () => {
-  if (productQuantity.value > 1) productQuantity.value--;
+let decrementQuantity = (product: CartProduct) => {
+  if (product.quantity > 1) product.quantity--;
+};
+
+let removeFromCart = (id: number) => {
+  productStore.removeFromCart(id);
+};
+
+const onlyNumber = ($event) => {
+  //console.log($event.keyCode); //keyCodes value
+  let keyCode = $event.keyCode ? $event.keyCode : $event.which;
+  if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
+    // 46 is dot
+    $event.preventDefault();
+  }
 };
 </script>
 
@@ -32,15 +48,29 @@ let decrementQuantity = () => {
       </div>
 
       <!-- Products -->
-      <div class="row py-3">
+      <div
+        v-if="productStore.getCartProducts.length"
+        v-for="product in productStore.getCartProducts"
+        :key="product.id"
+        class="row py-3"
+      >
         <div class="col-12 col-md-6 my-auto d-flex align-items-center gap-3">
-          <i class="bi bi-x-lg fs-5 order-2 order-md-0 ms-auto ms-md-0"></i>
-          <img class="product-img" src="../assets/earrings2.jpg" />
-          <h6>Kolczyki</h6>
+          <i
+            @click.prevent="removeFromCart(product.id)"
+            title="Usuń produkt z koszyka"
+            class="bi bi-x-lg fs-5 order-2 order-md-0 ms-auto ms-md-0"
+          ></i>
+          <img class="product-img" :src="product.url" />
+          <NuxtLink :to="`/product/${product.id}`">
+            <h6>{{ product.name }}</h6>
+          </NuxtLink>
         </div>
         <div class="col-12 col-md-2 text-md-center my-auto">
-          <h6 class="d-md-none fw-light mt-2 mt-md-0">Cena</h6>
-          <h6>400zł</h6>
+          <div v-if="product.discountPrice" class="d-flex flex-column mt-2 md-md-0">
+            <h6 class="discount">{{ product.price }}zł</h6>
+            <h6 class="price">{{ product.discountPrice }}zł</h6>
+          </div>
+          <h6 v-else class="mt-2 mt-md-0">{{ product.price }}zł</h6>
         </div>
         <div class="col-12 col-md-2 my-auto">
           <h6 class="d-md-none fw-light mt-2 mt-md-0">Ilość</h6>
@@ -48,56 +78,41 @@ let decrementQuantity = () => {
             class="d-flex align-items-center justify-content-md-center gap-2 product-quantity"
           >
             <i
-              @click="decrementQuantity"
+              @click="decrementQuantity(product)"
               class="bi bi-dash-circle"
               :class="{
-                grey: productQuantity < 2,
-                'highlight-icon': productQuantity > 1,
+                grey: product.quantity < 2,
+                'highlight-icon': product.quantity > 1,
               }"
             ></i>
-            <input v-model="productQuantity" class="quantity-input" type="number" />
-            <i @click="incrementQuantity" class="bi bi-plus-circle highlight-icon"></i>
+            <input
+              v-model="product.quantity"
+              class="quantity-input"
+              type="number"
+              min="1"
+              max="10"
+              @keypress="onlyNumber"
+            />
+            <i
+              @click="incrementQuantity(product)"
+              class="bi bi-plus-circle highlight-icon"
+            ></i>
           </div>
-          <p v-if="errorMsg" class="error mt-1">{{ errorMsg }}</p>
+          <p v-if="product.quantity < 1" class="error mt-1">{{ errorMsg }}</p>
         </div>
         <div class="col-2 my-auto">
           <h6 class="d-md-none fw-light mt-2 mt-md-0">Wartość</h6>
-          <h6 class="text-md-center">400zł</h6>
+          <h6 class="text-md-center">
+            {{
+              product.discountPrice
+                ? product.discountPrice * product.quantity
+                : product.price * product.quantity
+            }}zł
+          </h6>
         </div>
       </div>
-
-      <div class="row py-3">
-        <div class="col-12 col-md-6 my-auto d-flex align-items-center gap-3">
-          <i class="bi bi-x-lg fs-5 order-2 order-md-0 ms-auto ms-md-0"></i>
-          <img class="product-img" src="../assets/earrings.jpg" />
-          <h6>Kolczyki</h6>
-        </div>
-        <div class="col-12 col-md-2 text-md-center my-auto">
-          <h6 class="d-md-none fw-light mt-2 mt-md-0">Cena</h6>
-          <h6>400zł</h6>
-        </div>
-        <div class="col-12 col-md-2 my-auto">
-          <h6 class="d-md-none fw-light mt-2 mt-md-0">Ilość</h6>
-          <div
-            class="d-flex align-items-center justify-content-md-center gap-2 product-quantity"
-          >
-            <i
-              @click="decrementQuantity"
-              class="bi bi-dash-circle"
-              :class="{
-                grey: productQuantity < 2,
-                'highlight-icon': productQuantity > 1,
-              }"
-            ></i>
-            <input v-model="productQuantity" class="quantity-input" type="number" />
-            <i @click="incrementQuantity" class="bi bi-plus-circle highlight-icon"></i>
-          </div>
-          <p v-if="errorMsg" class="error mt-1">{{ errorMsg }}</p>
-        </div>
-        <div class="col-2 my-auto">
-          <h6 class="d-md-none fw-light mt-2 mt-md-0">Wartość</h6>
-          <h6 class="text-md-center">400zł</h6>
-        </div>
+      <div v-else class="alert alert-info mt-4 text-center" role="alert">
+        Brak produktów w twoim koszyku!
       </div>
 
       <!-- Summary -->
@@ -110,11 +125,16 @@ let decrementQuantity = () => {
           </NuxtLink>
         </div>
         <div class="col-12 col-md-4 my-auto d-flex justify-content-md-end">
-          <p class="fw-light fs-5">Razem: <span class="fw-normal">800zł</span></p>
+          <p class="fw-light fs-5">
+            Razem: <span class="fw-normal">{{ productStore.getCartTotal }}zł</span>
+          </p>
         </div>
         <div class="col-12 col-md-4 mt-3 mt-md-0">
           <NuxtLink to="#"
-            ><button class="btn btn-md btn-info py-2 px-4 text-light w-100">
+            ><button
+              :disabled="productStore.getCartProducts.length === 0"
+              class="btn btn-md btn-info py-2 px-4 text-light w-100"
+            >
               Zamawiam<i class="bi bi-chevron-right ms-2"></i>
             </button>
           </NuxtLink>
@@ -174,6 +194,11 @@ let decrementQuantity = () => {
 
 .quantity-input {
   width: 100%;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
 }
 
 @media screen and (max-width: 767px) {
