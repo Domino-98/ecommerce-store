@@ -31,6 +31,9 @@ export default defineNuxtConfig({
   env: {
     STRAPI_URL: `http://localhost:1337/api`,
   },
+  publicRuntimeConfig: {
+    STRIPE_KEY: process.env.STRIPE_KEY,
+  },
   buildModules: [
     // pinia plugin
     '@pinia/nuxt',

@@ -13,7 +13,7 @@ export const useProducts = defineStore('products', {
     getPromoProducts: (state) => state.promoProducts,
     getWishlistProducts: (state) => state.wishlistProducts,
     getCartProducts: (state) => state.cartProducts,
-    getCartTotal: (state) => state.cartProducts.length === 0 ? "0" : state.cartProducts.map((product) => {
+    getCartTotal: (state) => state.cartProducts.length === 0 ? 0 : state.cartProducts.map((product) => {
       if (product.discountPrice) {
         return product.discountPrice * product.quantity
       } else {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { loadStripe } from "@stripe/stripe-js";
 import { useProducts } from "~/stores/productStore";
 import type { CartProduct } from "~/models/cartproduct";
 
+const route = useRoute();
+const config = useRuntimeConfig();
 const productStore = useProducts();
-let errorMsg = ref<string>();
+const client = useStrapiClient();
 
 let incrementQuantity = (product: CartProduct) => {
   product.quantity++;
@@ -24,10 +27,81 @@ const onlyNumber = ($event) => {
     $event.preventDefault();
   }
 };
+
+// Modal
+let isOpen = ref<boolean>(false);
+let paymentSuccess = ref<boolean>();
+
+// Create order, payment
+const pay = async (e) => {
+  e.preventDefault();
+  isOpen.value = true;
+  const response: any = await client("/orders", {
+    method: "POST",
+    body: {
+      data: {
+        cartDetail: productStore.getCartProducts,
+        cartTotal: productStore.getCartTotal.toFixed(2),
+      },
+    },
+  });
+
+  const stripePromise = loadStripe(config.STRIPE_KEY);
+  const session = response;
+  const stripe = await stripePromise;
+  const result = await stripe.redirectToCheckout({
+    sessionId: session.id,
+  });
+  console.log(response);
+  if (result.error) {
+    console.log(result.error);
+  }
+};
+
+const displayMessage = () => {
+  if (route.query.success) {
+    paymentSuccess.value = true;
+    isOpen.value = true;
+    if (process.client) {
+      localStorage.removeItem("cart");
+    }
+  }
+  if (route.query.canceled) {
+    console.log("cancelled");
+    paymentSuccess.value = false;
+    isOpen.value = true;
+  }
+};
+
+onMounted(() => {
+  displayMessage();
+});
 </script>
 
 <template>
   <div>
+    <Modal :open="isOpen" @close="isOpen = !isOpen">
+      <template v-slot:icon>
+        <div v-if="paymentSuccess === false" class="sa-warning mx-auto">
+          <div class="sa-warning-body"></div>
+          <div class="sa-warning-dot"></div>
+        </div>
+      </template>
+      <template v-slot:body>
+        <div v-if="paymentSuccess === false">
+          <h4 class="mt-4">Zamówienie anulowane!</h4>
+          <p class="fs5 mt-3">Przejdź do płatności, gdy będziesz gotowy na zakup</p>
+        </div>
+        <div v-else-if="paymentSuccess === true">
+          <h4 class="mt-4">Zamówienie złożone!</h4>
+          <p class="fs5 mt-3">Dziękujemy za złożenie zamówienia!</p>
+        </div>
+        <div v-else>
+          <h4 class="mt-4">Proszę czekać</h4>
+          <p class="fs5 mt-3">Trwa przekierowywanie na stronę płatności...</p>
+        </div>
+      </template>
+    </Modal>
     <div class="container mt-4 mt-md-5">
       <h1 class="text-center fs-4 cart-header mx-auto mb-2 mb-md-0 position-relative">
         Zawartość twojego koszyka
@@ -98,7 +172,6 @@ const onlyNumber = ($event) => {
               class="bi bi-plus-circle highlight-icon"
             ></i>
           </div>
-          <p v-if="product.quantity < 1" class="error mt-1">{{ errorMsg }}</p>
         </div>
         <div class="col-2 my-auto">
           <h6 class="d-md-none fw-light mt-2 mt-md-0">Wartość</h6>
@@ -132,6 +205,7 @@ const onlyNumber = ($event) => {
         <div class="col-12 col-md-4 mt-3 mt-md-0">
           <NuxtLink to="#"
             ><button
+              @click="pay"
               :disabled="productStore.getCartProducts.length === 0"
               class="btn btn-md btn-info py-2 px-4 text-light w-100"
             >
