@@ -29,7 +29,7 @@ onMounted(() => {
 let cartItem = reactive<CartProduct>({
   id: props.product.id,
   name: props.product.attributes.Name,
-  url: `http://localhost:1337${props.product.attributes.Image.data[0].attributes.formats.small.url}`,
+  url: props.product.attributes.Image.data[0].attributes.formats.small.url,
   price: props.product.attributes.Price,
   discountPrice: props.product.discountPrice || null,
   quantity: 1,
@@ -88,12 +88,6 @@ const removeFromWishlist = (product) => {
           <div class="sa-warning-body"></div>
           <div class="sa-warning-dot"></div>
         </div>
-        <div v-else class="sa-success mx-auto">
-          <div class="sa-success-tip"></div>
-          <div class="sa-success-long"></div>
-          <div class="sa-success-placeholder"></div>
-          <div class="sa-success-fix"></div>
-        </div>
       </template>
       <template v-slot:body>
         <div v-if="modalType === 'cart'">
@@ -102,7 +96,7 @@ const removeFromWishlist = (product) => {
             Produkt {{ product.attributes.Name }} został dodany do koszyka!
           </p>
         </div>
-        <div v-else>
+        <div v-if="modalType === 'wishlist'">
           <h4 v-show="!product.onWishlist" class="mt-4">
             Produkt usunięty z twojej listy życzeń!
           </h4>
@@ -121,26 +115,19 @@ const removeFromWishlist = (product) => {
             Kontynuuj zakupy
           </button>
         </div>
-        <div v-else>
-          <div class="d-flex justify-content-evenly mt-4">
-            <button class="btn btn-md btn-outline-info px-4" @click="isOpen = false">
-              Ok
-            </button>
-          </div>
-        </div>
       </template>
     </Modal>
     <div class="row mt-4">
       <div class="col-12 col-lg-6">
         <img
-          :src="`http://localhost:1337${product.attributes.Image.data[0].attributes.formats.large.url}`"
+          :src="product.attributes.Image.data[0].attributes.formats.large.url"
           class="product-img"
         />
         <div class="d-flex mt-2 gap-2 thumbnail-list">
           <img
             v-for="image in product.attributes.Image.data"
             class="product-thumbnail"
-            :src="`http://localhost:1337${image.attributes.formats.large.url}`"
+            :src="image.attributes.formats.large.url"
           />
         </div>
       </div>

@@ -18,10 +18,23 @@ const close = () => {
     <Transition name="pop">
       <div v-if="open" class="modal-custom" role="dialog">
         <div class="sa">
-          <slot name="icon"></slot>
+          <slot name="icon">
+            <div class="sa-success mx-auto">
+              <div class="sa-success-tip"></div>
+              <div class="sa-success-long"></div>
+              <div class="sa-success-placeholder"></div>
+              <div class="sa-success-fix"></div>
+            </div>
+          </slot>
         </div>
         <slot name="body"></slot>
-        <slot name="button"></slot>
+        <slot name="button">
+          <div>
+            <div class="d-flex justify-content-evenly mt-4">
+              <button class="btn btn-md btn-outline-info px-4" @click="close">Ok</button>
+            </div>
+          </div>
+        </slot>
       </div>
     </Transition>
   </Teleport>

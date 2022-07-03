@@ -40,32 +40,19 @@ const removeFromWishlist = (product) => {
   <div>
     <Modal :open="isOpen" @close="isOpen = !isOpen">
       <template v-slot:icon>
-        <div v-show="!product.onWishlist" class="sa-warning mx-auto">
+        <div v-if="!product.onWishlist" class="sa-warning mx-auto">
           <div class="sa-warning-body"></div>
           <div class="sa-warning-dot"></div>
         </div>
-        <div v-show="product.onWishlist" class="sa-success mx-auto">
-          <div class="sa-success-tip"></div>
-          <div class="sa-success-long"></div>
-          <div class="sa-success-placeholder"></div>
-          <div class="sa-success-fix"></div>
-        </div>
       </template>
       <template v-slot:body>
-        <h4 v-show="!product.onWishlist" class="mt-4">
+        <h4 v-if="!product.onWishlist" class="mt-4">
           Produkt usunięty z twojej listy życzeń!
         </h4>
-        <h4 v-show="product.onWishlist" class="mt-4">Lista życzeń zaktualizowana!</h4>
-        <p v-show="product.onWishlist" class="fs5 mt-3">
+        <h4 v-if="product.onWishlist" class="mt-4">Lista życzeń zaktualizowana!</h4>
+        <p v-if="product.onWishlist" class="fs5 mt-3">
           Produkt {{ product.attributes.Name }} został dodany do listy życzeń!
         </p>
-      </template>
-      <template v-slot:button>
-        <div class="d-flex justify-content-evenly mt-4">
-          <button class="btn btn-md btn-outline-info px-4" @click="isOpen = false">
-            Ok
-          </button>
-        </div>
       </template>
     </Modal>
 
@@ -76,7 +63,7 @@ const removeFromWishlist = (product) => {
             -{{ discount }}%
           </div>
           <img
-            :src="`http://localhost:1337${product.attributes.Image.data[0].attributes.formats.medium.url}`"
+            :src="product.attributes.Image.data[0].attributes.formats.medium.url"
             class="w-100 h-100"
           />
           <i
@@ -121,7 +108,6 @@ const removeFromWishlist = (product) => {
   min-width: 300px;
   min-height: 300px;
   object-fit: cover;
-
   transition: transform 0.5s ease;
 }
 

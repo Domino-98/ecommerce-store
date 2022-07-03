@@ -13,6 +13,8 @@ onMounted(() => {
   }
 });
 
+let bestsellingProducts = ref();
+
 const fetchBestellers = async () => {
   try {
     const response: any = await find("bestsellers", {
@@ -23,11 +25,15 @@ const fetchBestellers = async () => {
       } as any,
     });
 
-    productStore.setBestsellingProducts(response.data[0].attributes.products.data);
+    bestsellingProducts.value = response.data[0].attributes.products.data;
+
+    productStore.setBestsellingProducts(bestsellingProducts.value);
   } catch (error) {
     console.log(error);
   }
 };
+
+let promoProducts = ref();
 
 const fetchPromos = async () => {
   try {
@@ -39,12 +45,12 @@ const fetchPromos = async () => {
       } as any,
     });
 
-    let promoProducts = response.data
+    promoProducts.value = response.data
       .sort((a, b) => b.attributes.Discount_percent - a.attributes.Discount_percent)
       .map((item) => item.attributes.products.data)
       .flat();
 
-    productStore.setPromoProducts(promoProducts);
+    productStore.setPromoProducts(promoProducts.value);
   } catch (error) {
     console.log(error);
   }
@@ -95,7 +101,7 @@ const calculateScroll = (container) => {
     <div class="hero">
       <div class="hero-text">
         <h1>Witamy w sklepie</h1>
-        <h1 class="fw-bold">G&D</h1>
+        <h1 class="fw-bold">D&G</h1>
         <p class="mt-1">Twój ulubiony sklep internetowy z biżuterią</p>
         <a href="#bestsellery" class="btn hero-btn btn-lg mt-3">Bestsellery</a>
       </div>
@@ -124,6 +130,10 @@ const calculateScroll = (container) => {
             :discount="product.attributes.discount.data?.attributes?.Discount_percent"
             @on-wishlist="(value) => (product.onWishlist = value)"
           />
+
+          <div v-if="!bestsellingProducts" v-for="product in 4">
+            <CardSkeleton />
+          </div>
         </div>
       </div>
 
@@ -151,6 +161,10 @@ const calculateScroll = (container) => {
             :discount="product.attributes.discount.data.attributes.Discount_percent"
             @on-wishlist="(value) => (product.onWishlist = value)"
           />
+
+          <div v-if="!promoProducts" class="skeleton" v-for="product in 4">
+            <CardSkeleton />
+          </div>
         </div>
       </div>
     </div>

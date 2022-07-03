@@ -47,6 +47,14 @@ onMounted(async () => {
             @on-wishlist="(value) => (product.onWishlist = value)"
           />
         </div>
+
+        <div
+          v-if="!products"
+          v-for="product in 4"
+          class="col-12 col-md-6 col-lg-4 col-xl-3 py-3"
+        >
+          <CardSkeleton />
+        </div>
       </div>
     </div>
   </div>

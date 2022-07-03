@@ -1,6 +1,6 @@
 <script setup lang="ts">
 let showTopbar = ref<boolean>(true);
-let promoArray = ref<string[]>(["Darmowa dostawa od 199zł!", "Summer sale do -70%!"]);
+let promoArray = ref<string[]>(["Darmowa dostawa!", "Summer sale do -30%!"]);
 let promoIndex = ref<number>(0);
 
 let toggleNav = ref<boolean>(false);
@@ -27,7 +27,7 @@ setInterval(() => {
       <div class="container-fluid">
         <a class="navbar-brand position-md-absolute logo fs-3" href="#">D&G</a>
         <div class="d-flex gap-4 position-md-absolute ms-auto nav-icons">
-          <i class="bi bi-person"></i>
+          <!-- <i class="bi bi-person"></i> -->
           <NuxtLink to="/wishlist" title="Lista życzeń"
             ><i class="bi bi-heart"></i
           ></NuxtLink>
