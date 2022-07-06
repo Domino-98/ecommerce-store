@@ -1,26 +1,53 @@
-<template>
-  <div
-    class="newsletter mt-5 p-5 text-light d-flex flex-column align-items-center justify-content-center"
-  >
-    <h1>Newsletter</h1>
+<script setup lang="ts">
+const client = useStrapiClient();
 
-    <form class="newsletter-form text-center">
-      <label for="newsletter" class="form-label mt-3 fs-5">Dołącz do nas</label>
-      <div class="input-group mt-3 align-self-center">
-        <input
-          id="newsletter"
-          type="email"
-          class="form-control p-2"
-          placeholder="Podaj adres email"
-          aria-label="Podaj adres email"
-          aria-describedby="basic-addon2"
-          required
-        />
-        <button type="submit" class="btn btn-info text-light newsletter-btn">
-          Zapisz się
-        </button>
-      </div>
-    </form>
+const email = ref<string>("");
+let isOpen = ref<boolean>(false);
+
+const subscribe = async () => {
+  isOpen.value = true;
+
+  await client("/subscribers", {
+    method: "POST",
+    body: {
+      Email: email.value,
+    },
+  });
+
+  email.value = "";
+};
+</script>
+
+<template>
+  <div>
+    <Modal :open="isOpen" @close="isOpen = !isOpen">
+      <template v-slot:body>
+        <h4 class="mt-4">Dziękujemy za subskrypcje!</h4>
+      </template>
+    </Modal>
+    <div
+      class="newsletter mt-5 p-5 text-light d-flex flex-column align-items-center justify-content-center"
+    >
+      <h1>Newsletter</h1>
+      <form @submit.prevent="subscribe" class="newsletter-form text-center">
+        <label for="newsletter" class="form-label mt-3 fs-5">Dołącz do nas</label>
+        <div class="input-group mt-3">
+          <input
+            v-model="email"
+            id="newsletter"
+            type="email"
+            class="form-control p-2"
+            placeholder="Podaj adres email"
+            aria-label="Podaj adres email"
+            aria-describedby="basic-addon2"
+            required
+          />
+          <button type="submit" class="btn btn-info text-light newsletter-btn">
+            Zapisz się
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -52,6 +79,7 @@
 .newsletter-form input {
   border-top-left-radius: 0.5rem;
   border-bottom-left-radius: 0.5rem;
+  font-family: inherit;
 }
 
 .newsletter-form input:focus {
@@ -61,19 +89,5 @@
 .newsletter-btn {
   border-top-right-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-}
-
-.quantity-input {
-  text-align: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border: none;
-  background-color: #eee;
-  transition: all 0.3s;
-}
-
-.quantity-input:focus {
-  outline: none;
-  box-shadow: 0 0 4px #00bfff;
 }
 </style>
