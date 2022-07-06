@@ -31,7 +31,7 @@ let cartItem = reactive<CartProduct>({
   name: props.product.attributes.Name,
   url: props.product.attributes.Image.data[0].attributes.formats.small.url,
   price: props.product.attributes.Price,
-  discountPrice: props.product.discountPrice || null,
+  discountPrice: props.product.attributes.discountPrice || null,
   quantity: 1,
 });
 
@@ -74,6 +74,12 @@ const removeFromWishlist = (product) => {
   setWishlist(false);
   isOpen.value = true;
   productStore.removeFromWishlist(product.id);
+};
+
+let mainImg = ref(props.product.attributes.Image.data[0].attributes.formats.large.url);
+
+const setImage = (imgSrc) => {
+  mainImg.value = imgSrc;
 };
 </script>
 
@@ -118,20 +124,24 @@ const removeFromWishlist = (product) => {
       </template>
     </Modal>
     <div class="row mt-4">
-      <div class="col-12 col-lg-6">
-        <img
-          :src="product.attributes.Image.data[0].attributes.formats.large.url"
-          class="product-img"
-        />
-        <div class="d-flex mt-2 gap-2 thumbnail-list">
+      <div class="col-12 col-lg-1 pe-lg-0 order-1 order-lg-0 mt-2 mt-lg-0">
+        <div class="d-flex flex-lg-column gap-2 thumbnail-list">
           <img
+            @click="setImage(image.attributes.formats.large.url)"
+            :class="{ 'active-img': mainImg === image.attributes.formats.large.url }"
             v-for="image in product.attributes.Image.data"
+            :key="image.id"
             class="product-thumbnail"
             :src="image.attributes.formats.large.url"
           />
         </div>
       </div>
-      <div class="col-12 col-lg-6">
+      <div class="col-12 col-lg-6 order-0">
+        <Transition name="fade" mode="out-in">
+          <img :src="mainImg" :key="mainImg" class="product-img" />
+        </Transition>
+      </div>
+      <div class="col-12 col-lg-5 order-2">
         <h2 class="mt-2 mt-lg-0">{{ product.attributes.Name }}</h2>
         <div v-if="product.attributes.discount.data" class="mt-1">
           <p>
@@ -197,17 +207,21 @@ const removeFromWishlist = (product) => {
 
 <style scoped>
 .product-img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   border-radius: 0.75rem;
-}
-
-.thumbnail-list {
-  overflow-x: auto;
 }
 
 .product-thumbnail {
-  width: 7.5rem;
+  width: 6rem;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius: 0.75rem;
   cursor: pointer;
+}
+
+.active-img {
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
 }
 
 input[type="number"] {
@@ -274,6 +288,13 @@ input[type="number"] {
   .quantity-input {
     width: 3rem;
     height: 3rem;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .product-thumbnail {
+    width: unset;
+    aspect-ratio: 1 / 1;
   }
 }
 </style>

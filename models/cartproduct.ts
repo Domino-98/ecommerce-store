@@ -3,6 +3,6 @@ export interface CartProduct {
     name: string;
     url: string;
     price: number;
-    discountPrice: number,
+    discountPrice?: number,
     quantity: number;
 }

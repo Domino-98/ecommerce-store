@@ -16,7 +16,7 @@ const fetchProduct = async () => {
     });
 
     product.value = response.data;
-    product.value.discountPrice =
+    product.value.attributes.discountPrice =
       product.value.attributes.Price -
       product.value.attributes.Price *
         (product.value.attributes.discount?.data?.attributes?.Discount_percent / 100);

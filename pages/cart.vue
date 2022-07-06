@@ -36,6 +36,8 @@ let paymentSuccess = ref<boolean>();
 const pay = async (e) => {
   e.preventDefault();
   isOpen.value = true;
+  paymentSuccess.value = null;
+
   const response: any = await client("/orders", {
     method: "POST",
     body: {
@@ -102,7 +104,7 @@ onMounted(() => {
         </div>
       </template>
     </Modal>
-    <div class="container mt-4 mt-md-5">
+    <div class="container mt-4">
       <h1 class="text-center fs-4 cart-header mx-auto mb-2 mb-md-0 position-relative">
         Zawartość twojego koszyka
       </h1>
@@ -254,6 +256,7 @@ onMounted(() => {
 
 .product-img {
   width: 10rem;
+  aspect-ratio: 4 / 3;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 

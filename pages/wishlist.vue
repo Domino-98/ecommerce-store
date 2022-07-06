@@ -6,7 +6,7 @@ let productStore = useProducts();
 
 <template>
   <div>
-    <h2 class="text-center mt-4">Twoja lista życzeń</h2>
+    <h3 class="text-center mt-4">Twoja lista życzeń</h3>
     <div class="container">
       <div class="row mt-2 g-0">
         <div

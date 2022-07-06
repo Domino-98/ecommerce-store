@@ -13,8 +13,6 @@ onMounted(() => {
   }
 });
 
-let bestsellingProducts = ref();
-
 const fetchBestellers = async () => {
   try {
     const response: any = await find("bestsellers", {
@@ -25,15 +23,11 @@ const fetchBestellers = async () => {
       } as any,
     });
 
-    bestsellingProducts.value = response.data[0].attributes.products.data;
-
-    productStore.setBestsellingProducts(bestsellingProducts.value);
+    productStore.setBestsellingProducts(response.data[0].attributes.products.data);
   } catch (error) {
     console.log(error);
   }
 };
-
-let promoProducts = ref();
 
 const fetchPromos = async () => {
   try {
@@ -45,12 +39,12 @@ const fetchPromos = async () => {
       } as any,
     });
 
-    promoProducts.value = response.data
+    let promoProducts = response.data
       .sort((a, b) => b.attributes.Discount_percent - a.attributes.Discount_percent)
       .map((item) => item.attributes.products.data)
       .flat();
 
-    productStore.setPromoProducts(promoProducts.value);
+    productStore.setPromoProducts(promoProducts);
   } catch (error) {
     console.log(error);
   }
@@ -101,14 +95,14 @@ const calculateScroll = (container) => {
     <div class="hero">
       <div class="hero-text">
         <h1>Witamy w sklepie</h1>
-        <h1 class="fw-bold">D&G</h1>
+        <h1 class="hero-logo">G&D</h1>
         <p class="mt-1">Twój ulubiony sklep internetowy z biżuterią</p>
-        <a href="#bestsellery" class="btn hero-btn btn-lg mt-3">Bestsellery</a>
+        <a href="#bestsellers" class="btn hero-btn btn-lg mt-3">Bestsellery</a>
       </div>
     </div>
     <div class="container">
-      <h2 id="bestsellery" class="text-center mt-5 mb-1">Bestsellery</h2>
-      <div class="position-relative">
+      <h2 class="text-center mt-5 mb-1">Bestsellery</h2>
+      <div id="bestsellers" class="position-relative">
         <i
           v-if="bestsellersScroll > 0"
           @click="scrollLeft(bestsellersContainer)"
@@ -131,13 +125,16 @@ const calculateScroll = (container) => {
             @on-wishlist="(value) => (product.onWishlist = value)"
           />
 
-          <div v-if="!bestsellingProducts" v-for="product in 4">
+          <div
+            v-if="productStore.getBestsellingProducts.length === 0"
+            v-for="product in 4"
+          >
             <CardSkeleton />
           </div>
         </div>
       </div>
 
-      <h2 id="bestsellery" class="text-center mt-3 mb-1">Promocje</h2>
+      <h2 class="text-center mt-3 mb-1">Promocje</h2>
       <div class="position-relative">
         <i
           v-if="promosScroll > 0"
@@ -162,7 +159,11 @@ const calculateScroll = (container) => {
             @on-wishlist="(value) => (product.onWishlist = value)"
           />
 
-          <div v-if="!promoProducts" class="skeleton" v-for="product in 4">
+          <div
+            v-if="productStore.getPromoProducts.length === 0"
+            class="skeleton"
+            v-for="product in 4"
+          >
             <CardSkeleton />
           </div>
         </div>
@@ -179,14 +180,14 @@ const calculateScroll = (container) => {
   scroll-behavior: smooth;
 }
 .scroll-btn {
-  color: #a0a0a0;
   z-index: 100;
+  height: 100%;
+  width: 10vw;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s;
-  height: 100%;
-  width: 10vw;
+  color: #a0a0a0;
   cursor: pointer;
 }
 
@@ -211,12 +212,19 @@ const calculateScroll = (container) => {
 }
 .hero {
   position: relative;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+  height: 80vh;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.5)),
     url("../assets/hero.jpg");
-  height: 70vh;
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+.hero-logo {
+  letter-spacing: 0.1rem;
+  font-family: "Rubik", sans-serif;
+  text-shadow: 5px 5px 0px rgba(0, 0, 0, 0.1);
 }
 
 .hero-text {
@@ -257,6 +265,10 @@ const calculateScroll = (container) => {
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; /* for Firefox */
   overflow-y: scroll;
+}
+
+#bestsellers {
+  scroll-margin-top: 160px;
 }
 
 @media (hover: none) {
