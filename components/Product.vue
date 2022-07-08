@@ -31,18 +31,16 @@ let cartItem = reactive<CartProduct>({
   name: props.product.attributes.Name,
   url: props.product.attributes.Image.data[0].attributes.formats.small.url,
   price: props.product.attributes.Price,
-  discountPrice: props.product.attributes.discountPrice || null,
+  discountPrice: props.product.attributes.New_price || null,
   quantity: 1,
 });
 
 let incrementQuantity = () => {
   cartItem.quantity++;
-  console.log(cartItem.quantity);
 };
 
 let decrementQuantity = () => {
   if (cartItem.quantity > 1) cartItem.quantity--;
-  console.log(cartItem.quantity);
 };
 
 const addToCart = () => {
@@ -78,7 +76,7 @@ const removeFromWishlist = (product) => {
 
 let mainImg = ref(props.product.attributes.Image.data[0].attributes.formats.large.url);
 
-const setImage = (imgSrc) => {
+const setImage = (imgSrc: string) => {
   mainImg.value = imgSrc;
 };
 </script>
@@ -146,7 +144,7 @@ const setImage = (imgSrc) => {
         <div v-if="product.attributes.discount.data" class="mt-1">
           <p>
             <span class="discount me-2 fs-4">{{ product.attributes.Price }}</span>
-            <span class="price fs-4">{{ product.discountPrice }}zł</span>
+            <span class="price fs-4">{{ product.attributes.New_price }}zł</span>
           </p>
           <p class="text-dark text-black-50">
             Oszczędzasz

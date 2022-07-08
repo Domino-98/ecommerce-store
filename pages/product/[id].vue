@@ -16,11 +16,7 @@ const fetchProduct = async () => {
     });
 
     product.value = response.data;
-    product.value.attributes.discountPrice =
-      product.value.attributes.Price -
-      product.value.attributes.Price *
-        (product.value.attributes.discount?.data?.attributes?.Discount_percent / 100);
-    console.log(product.value);
+
     categoryName.value = response.data.attributes.category.data.attributes.Name;
   } catch (error) {
     console.log(error);

@@ -507,9 +507,9 @@
     vite-plugin-checker "^0.4.6"
 
 "@nuxtjs/strapi@npm:@nuxtjs/strapi-edge@latest":
-  version "1.4.0-27605343.cb4b235"
-  resolved "https://registry.npmjs.org/@nuxtjs/strapi-edge/-/strapi-edge-1.4.0-27605343.cb4b235.tgz"
-  integrity sha512-vznok9HfUMO5FqKE6M5vKSyQWVvjOUN1Po6OxaMJD7htj5CbTPwLnX60to9EaSE8BIu1eWzZMgMt6/SwheAiAw==
+  version "1.4.0-27613143.f9fa58b"
+  resolved "https://registry.npmjs.org/@nuxtjs/strapi-edge/-/strapi-edge-1.4.0-27613143.f9fa58b.tgz"
+  integrity sha512-cn8kjx7bSlWnv/lDR5zDSnH2ofxOy/wcrCQRroa22sUvsj16S1plwBLfAIDDJzN9lvxkSmO9slAP1QS6JvFMCA==
   dependencies:
     "@nuxt/kit" "^3.0.0-rc.4"
     defu "^6.0.0"
@@ -604,7 +604,7 @@
 
 "@stripe/stripe-js@^1.32.0":
   version "1.32.0"
-  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.32.0.tgz#4ecdd298db61ad9b240622eafed58da974bd210e"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-1.32.0.tgz"
   integrity sha512-7EvBnbBfS1aynfLRmBFcuumHNGjKxnNkO47rorFBktqDYHwo7Yw6pfDW2iqq0R8r7i7XiJEdWPvvEgQAiDrx3A==
 
 "@trysound/sax@0.2.0":
@@ -1155,6 +1155,11 @@ cli-width@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/cli-width/-/cli-width-3.0.0.tgz"
   integrity sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==
+
+click-outside-vue3@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/click-outside-vue3/-/click-outside-vue3-4.0.1.tgz#81a6ac01696b301764b42db6fdbdf28e7cd8ef95"
+  integrity sha512-sbplNecrup5oGqA3o4bo8XmvHRT6q9fvw21Z67aDbTqB9M6LF7CuYLTlLvNtOgKU6W3zst5H5zJuEh4auqA34g==
 
 clipboardy@^3.0.0:
   version "3.0.0"
@@ -4355,7 +4360,7 @@ vscode-uri@^3.0.2:
 
 vue-awesome-paginate@^0.0.9:
   version "0.0.9"
-  resolved "https://registry.yarnpkg.com/vue-awesome-paginate/-/vue-awesome-paginate-0.0.9.tgz#c59061eb7cb9c9157e241bd7cdc8447eade0e648"
+  resolved "https://registry.npmjs.org/vue-awesome-paginate/-/vue-awesome-paginate-0.0.9.tgz"
   integrity sha512-2UYSv4RRDZuq/u+KY4QXIW2R6eVgtgbHM/8loz3mR2UvV0/sdNJXwaydsIe2QTSq5U8oFwWLpxjVQUK6xyB1JQ==
   dependencies:
     vue "^3.2.25"

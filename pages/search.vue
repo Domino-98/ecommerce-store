@@ -2,9 +2,12 @@
 const { find } = useStrapi4();
 const route = useRoute();
 const router = useRouter();
+let minPrice = computed(() => route.query.minPrice);
+let maxPrice = computed(() => route.query.maxPrice);
+let sort = computed(() => route.query.sort);
 let searchQuery = computed(() => route.query.name);
 let currentPage = computed(() => +route.query.page || 1);
-let pageSize = ref<number>(8);
+let pageSize = ref<number>(12);
 
 let products = ref();
 let pagination = ref();
@@ -25,17 +28,32 @@ const fetchProducts = async () => {
         Name: {
           $containsi: searchQuery.value,
         },
+        $or: [
+          {
+            $and: [
+              { New_price: { $notNull: true } },
+              { New_price: { $gte: minPrice.value } },
+              { New_price: { $lte: maxPrice.value } },
+            ],
+          },
+          {
+            $and: [
+              { New_price: { $null: true } },
+              { Price: { $gte: minPrice.value } },
+              { Price: { $lte: maxPrice.value } },
+            ],
+          },
+        ],
       },
+      sort: sort.value || "Name:asc",
       pagination: {
         pageSize: pageSize.value,
         page: currentPage.value || 1,
-      } as any,
+      },
     });
 
     products.value = response.data;
     pagination.value = response.meta.pagination;
-
-    console.log(products.value);
 
     response.data.length === 0 ? (found.value = false) : (found.value = true);
   } catch (error) {
@@ -44,23 +62,35 @@ const fetchProducts = async () => {
 };
 
 const changePage = (page: number) => {
-  router.push({
+  router.replace({
     path: "/search",
-    query: { name: searchQuery.value, page: page },
+    query: {
+      ...route.query,
+      page: page,
+    },
   });
+  window.scrollTo(0, 0);
 };
 
-watch(searchQuery, fetchProducts);
-watch(currentPage, fetchProducts);
+watch([searchQuery, currentPage, minPrice, maxPrice, sort], fetchProducts);
 </script>
 
 <template>
   <div>
     <h3 class="text-center mt-4">
-      <span class="fw-light">Wynik wyszukiwania dla: </span
+      <span class="fw-light">Wyniki wyszukiwania dla: </span
       >{{ searchQuery || "Wszystkie produkty" }}
     </h3>
     <div class="container d-flex flex-column">
+      <div
+        :class="{ 'flex-column gap-2': minPrice || maxPrice }"
+        class="d-flex flex-md-row justify-content-between mt-2"
+      >
+        <Filter />
+
+        <Sort />
+      </div>
+
       <div class="row mt-2 g-0">
         <div
           class="col-12 col-md-6 col-lg-4 col-xl-3 py-3"
@@ -88,7 +118,7 @@ watch(currentPage, fetchProducts);
           class="alert alert-info mt-4 text-center"
           role="alert"
         >
-          Nie znaleziono produktów z podaną nazwą
+          Nie znaleziono takich produktów
         </div>
       </div>
 
