@@ -12,6 +12,7 @@ export default defineNuxtConfig({
         href: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css",
         rel: 'stylesheet',
       },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
     ],
     script: [
       {
@@ -27,9 +28,6 @@ export default defineNuxtConfig({
     prefix: '/api',
     version: 'v4',
     cookie: {},
-  },
-  env: {
-    STRAPI_URL: `http://localhost:1337/api`,
   },
   publicRuntimeConfig: {
     STRIPE_KEY: process.env.STRIPE_KEY,

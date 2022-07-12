@@ -17,6 +17,7 @@ const searchProducts = () => {
     path: "/search",
     query: {
       name: searchQuery.value,
+      page: 1,
     },
   });
 };

@@ -7,7 +7,7 @@ let footerInfos = ref([
   {
     name: "Obsługa",
     items: [
-      "Zakupy w sklepie D&G",
+      "Zakupy w sklepie G&D",
       "Formy i dostawy płatności",
       "Zwroty i reklamacje",
       "Gwarancja autentyczności produktów",
@@ -24,7 +24,7 @@ let footerInfos = ref([
   },
   {
     name: "Kontakt",
-    items: ["+48 55 555 55 55", "Pn-pt 9:00-18:00", "dandg@example.com"],
+    items: ["+48 55 555 55 55", "Pn-pt 9:00-18:00", "gandd@example.com"],
   },
 ]);
 </script>

@@ -48,8 +48,6 @@ const fetchPromos = async () => {
   } catch (error) {
     console.log(error);
   }
-
-  console.log();
 };
 
 let bestsellersContainer = ref();

@@ -20,10 +20,8 @@ let removeFromCart = (id: number) => {
 };
 
 const onlyNumber = ($event) => {
-  //console.log($event.keyCode); //keyCodes value
   let keyCode = $event.keyCode ? $event.keyCode : $event.which;
   if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
-    // 46 is dot
     $event.preventDefault();
   }
 };
@@ -48,7 +46,7 @@ const pay = async (e) => {
     },
   });
 
-  const stripePromise = loadStripe(config.STRIPE_KEY);
+  const stripePromise = await loadStripe(config.STRIPE_KEY);
   const session = response;
   const stripe = await stripePromise;
   const result = await stripe.redirectToCheckout({

@@ -49,7 +49,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="position-relative ms-3 ms-md-0 me-md-3">
+    <div class="position-relative ms-3 ms-md-0 me-3">
       <button @click="toggleSort" class="btn btn-outline-info btn-md" type="button">
         Sortuj: {{ activeSort }}
         <i :class="{ flip: showSort }" class="bi bi-chevron-down"></i>
