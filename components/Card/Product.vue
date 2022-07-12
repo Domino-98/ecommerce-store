@@ -26,7 +26,9 @@ onMounted(() => {
 const addToWishlist = (product) => {
   setWishlist(true);
   isOpen.value = true;
-  productStore.addToWishlist(product);
+  if (!productStore.getWishlistProducts.some((p) => p.id === product.id)) {
+    productStore.addToWishlist(product);
+  }
 };
 
 const removeFromWishlist = (product) => {
